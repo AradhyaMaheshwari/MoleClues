@@ -1,0 +1,12 @@
+# Secret answer key and local attempt records (never commit these)
+backend/answers.json
+backend/attempts.json
+.env
+.env.local
+.env.production
+
+# Runtime / package outputs
+*.log
+node_modules/
+.vercel/
+.netlify/

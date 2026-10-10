@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/session", "destination": "/serverless/api/session.js" },
+    { "source": "/api/submit", "destination": "/serverless/api/submit.js" },
+    { "source": "/api/leaderboard", "destination": "/serverless/api/leaderboard.js" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
+  ]
+}

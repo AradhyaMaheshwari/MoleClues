@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a140d">
+  <title>MoleClues · Admin Leaderboard</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header">
+      <div>
+        <p class="eyebrow">MOLECLUES · EVENT CONTROL</p>
+        <h1>Attempt Dashboard</h1>
+        <p class="muted">Team times and fastest correct completions.</p>
+      </div>
+      <a class="back-link" href="/">← Crossword</a>
+    </header>
+
+    <section class="panel login-panel" id="loginPanel">
+      <h2>Administrator sign-in</h2>
+      <p class="muted">Enter the administrator password configured for this deployment.</p>
+      <form id="adminLoginForm" class="login-form">
+        <label for="adminPasswordInput">Admin password</label>
+        <input id="adminPasswordInput" type="password" autocomplete="current-password" required>
+        <button type="submit" id="loginButton">View leaderboard</button>
+      </form>
+      <p class="error" id="loginError" role="alert"></p>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="toolbar">
+        <p id="lastUpdated" class="muted" aria-live="polite">Not loaded yet</p>
+        <div class="toolbar-actions">
+          <button type="button" class="secondary" id="refreshButton">Refresh</button>
+          <button type="button" class="secondary" id="logoutButton">Log out</button>
+        </div>
+      </div>
+
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div><h2>Fastest correct completions</h2><p class="muted">One best fully correct time per team name.</p></div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Rank</th><th>Team</th><th>Time</th><th>Submitted at</th></tr></thead>
+            <tbody id="rankedBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="rankedEmpty" hidden>No fully correct submissions yet.</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div><h2>All attempts</h2><p class="muted">Includes teams that started but have not completed the puzzle yet.</p></div>
+          <span id="attemptCount" class="count-pill">0 attempts</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Team</th><th>Status</th><th>Score</th><th>Elapsed / completion time</th><th>Started at</th><th>Submitted at</th></tr></thead>
+            <tbody id="attemptsBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="attemptsEmpty" hidden>No teams have started the crossword.</p>
+      </section>
+      <p class="footnote">Keep this dashboard private. Only event administrators should have the password.</p>
+    </section>
+  </main>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+MOLECLUES LOCAL PREVIEW (Windows)
+
+1. Extract the project ZIP.
+2. Open the extracted moleclues-leaderboard-project folder in VS Code.
+3. Open Terminal > New Terminal at the project root.
+4. Run:
+   powershell -ExecutionPolicy Bypass -File ".\scripts\run-local-server.ps1" -Port 3000
+5. Open http://localhost:3000 to play the crossword.
+6. Open http://localhost:3000/admin.html to view the private local attempt dashboard.
+7. The terminal prints the local-only admin password (default: moleclues-local-admin).
+8. Press Ctrl+C in the terminal to stop the server.
+
+Local results are stored in backend/attempts.json, which is ignored by Git. This package includes an empty ledger ([]) to reset earlier local test entries. To clear results again, stop the server and replace the file contents with [].
+
+For Netlify deployment and the persistent Supabase-backed leaderboard, follow README.md and run supabase/schema.sql in your Supabase project's SQL Editor before setting the required Netlify environment variables.
+
+Keep backend/answers.json, backend/attempts.json, all database secret keys, the admin password, and the HMAC session secret out of public Git.

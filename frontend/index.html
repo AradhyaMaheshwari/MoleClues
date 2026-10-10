@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MoleClues · Cellular Biology Crossword</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Animated living microscopy canvas: floating cells, organelles, rotating DNA, molecular rings -->
+<canvas id="bio-canvas" aria-hidden="true"></canvas>
+
+<div class="app-container">
+  <!-- Top Floating Capsule Header (Narrow Glassmorphic Pill) -->
+  <header class="top-bar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 3 C9 7, 13 7, 16 11 C13 15, 9 15, 6 19" stroke="#7abf8c" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M16 3 C13 7, 9 7, 6 11 C9 15, 13 15, 16 19" stroke="#a3d977" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <line x1="9" y1="6.5" x2="13" y2="6.5" stroke="#c8a96e" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="7.2" y1="11" x2="14.8" y2="11" stroke="#c8a96e" stroke-width="1.3" stroke-linecap="round"/>
+          <line x1="9" y1="15.5" x2="13" y2="15.5" stroke="#c8a96e" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <div class="brand-text-wrap">
+        <span class="brand-title">MoleClues</span>
+      </div>
+    </div>
+    <div class="top-meta-capsule">
+      <div class="mini-track" title="Assembly progress"><div class="mini-fill" id="miniProgressFill"></div></div>
+      <span class="meta-count" id="miniProgressText">0/62 cells assembled</span>
+      <span class="meta-dot-sep">·</span>
+      <span class="meta-timer" id="sessionTimerText">⏱ 00:00</span>
+    </div>
+  </header>
+
+  <!-- Pinned Active Clue Banner -->
+  <div class="clue-banner" id="activeClueBanner">
+    <button class="clue-nav-btn" id="prevWordBtn" title="Previous Word">◀</button>
+    <div class="clue-banner-content" id="clueBannerContent">
+      <div class="clue-badge-row">
+        <span class="clue-dir-badge" id="activeClueBadge">1 DOWN</span>
+        <span class="clue-dir-switch">(Tap ⇄)</span>
+      </div>
+      <div class="clue-banner-text" id="activeClueText">Select any cell to inspect pathway clue</div>
+    </div>
+    <button class="clue-nav-btn" id="nextWordBtn" title="Next Word">▶</button>
+  </div>
+
+  <!-- Interactive Grid Viewport -->
+  <div class="grid-viewport" id="gridViewport">
+    <!-- Biology Background Watermark: DNA Helix, Cell Organelles, Mitochondria & Circular Vectors -->
+    <div class="grid-bio-watermark" aria-hidden="true">
+      <svg viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" class="bio-watermark-svg" xmlns="http://www.w3.org/2000/svg">
+        <!-- Left DNA Double Helix -->
+        <g class="bio-dna-left" opacity="0.9">
+          <path d="M 90 20 C 30 80, 30 140, 90 200 C 150 260, 150 320, 90 380 C 30 440, 30 500, 90 560 C 150 620, 150 680, 90 740 C 60 770, 45 790, 35 800"
+                fill="none" stroke="#7abf8c" stroke-width="2" stroke-linecap="round"/>
+          <path d="M 90 20 C 150 80, 150 140, 90 200 C 30 260, 30 320, 90 380 C 150 440, 150 500, 90 560 C 30 620, 30 680, 90 740 C 120 770, 135 790, 145 800"
+                fill="none" stroke="#a3d977" stroke-width="2" stroke-linecap="round"/>
+          <line x1="52" y1="50" x2="128" y2="50" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="32" y1="80" x2="148" y2="80" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="32" y1="110" x2="148" y2="110" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="52" y1="140" x2="128" y2="140" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="82" y1="170" x2="98" y2="170" stroke="#c8a96e" stroke-width="1.3"/>
+          <circle cx="90" cy="200" r="2.8" fill="#7abf8c"/>
+          <line x1="52" y1="230" x2="128" y2="230" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="32" y1="260" x2="148" y2="260" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="32" y1="290" x2="148" y2="290" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="52" y1="320" x2="128" y2="320" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="82" y1="350" x2="98" y2="350" stroke="#c8a96e" stroke-width="1.3"/>
+          <circle cx="90" cy="380" r="2.8" fill="#a3d977"/>
+          <line x1="52" y1="410" x2="128" y2="410" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="32" y1="440" x2="148" y2="440" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="32" y1="470" x2="148" y2="470" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="52" y1="500" x2="128" y2="500" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="82" y1="530" x2="98" y2="530" stroke="#c8a96e" stroke-width="1.3"/>
+          <circle cx="90" cy="560" r="2.8" fill="#7abf8c"/>
+          <line x1="52" y1="590" x2="128" y2="590" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="32" y1="620" x2="148" y2="620" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="32" y1="650" x2="148" y2="650" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="52" y1="680" x2="128" y2="680" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="82" y1="710" x2="98" y2="710" stroke="#c8a96e" stroke-width="1.3"/>
+          <circle cx="90" cy="740" r="2.8" fill="#a3d977"/>
+        </g>
+
+        <!-- Right DNA Double Helix -->
+        <g class="bio-dna-right" opacity="0.9">
+          <path d="M 910 20 C 850 80, 850 140, 910 200 C 970 260, 970 320, 910 380 C 850 440, 850 500, 910 560 C 970 620, 970 680, 910 740 C 880 770, 865 790, 855 800"
+                fill="none" stroke="#a3d977" stroke-width="2" stroke-linecap="round"/>
+          <path d="M 910 20 C 970 80, 970 140, 910 200 C 850 260, 850 320, 910 380 C 970 440, 970 500, 910 560 C 850 620, 850 680, 910 740 C 940 770, 955 790, 965 800"
+                fill="none" stroke="#7abf8c" stroke-width="2" stroke-linecap="round"/>
+          <line x1="872" y1="50" x2="948" y2="50" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="852" y1="80" x2="968" y2="80" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="852" y1="110" x2="968" y2="110" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="872" y1="140" x2="948" y2="140" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <circle cx="910" cy="200" r="2.8" fill="#c8a96e"/>
+          <line x1="872" y1="230" x2="948" y2="230" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="852" y1="260" x2="968" y2="260" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="852" y1="290" x2="968" y2="290" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="872" y1="320" x2="948" y2="320" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <circle cx="910" cy="380" r="2.8" fill="#7abf8c"/>
+          <line x1="872" y1="410" x2="948" y2="410" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="852" y1="440" x2="968" y2="440" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="852" y1="470" x2="968" y2="470" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="872" y1="500" x2="948" y2="500" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <circle cx="910" cy="560" r="2.8" fill="#a3d977"/>
+          <line x1="872" y1="590" x2="948" y2="590" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <line x1="852" y1="620" x2="968" y2="620" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="852" y1="650" x2="968" y2="650" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="18 3 18"/>
+          <line x1="872" y1="680" x2="948" y2="680" stroke="#c8a96e" stroke-width="1.3" stroke-dasharray="14 3 14"/>
+          <circle cx="910" cy="740" r="2.8" fill="#c8a96e"/>
+        </g>
+
+        <!-- Eukaryotic Cell Diagram (Top Right) -->
+        <g class="bio-cell-eukaryote" transform="translate(740, 50)" opacity="0.85">
+          <path d="M 60 10 C 130 5, 190 40, 195 100 C 200 160, 160 210, 100 215 C 40 220, 5 180, 2 120 C -2 60, 15 15, 60 10 Z"
+                fill="none" stroke="#7abf8c" stroke-width="1.6" stroke-dasharray="5 2"/>
+          <path d="M 62 14 C 128 9, 185 43, 190 99 C 195 156, 156 205, 99 210 C 42 215, 9 176, 6 119 C 3 62, 19 19, 62 14 Z"
+                fill="none" stroke="#a3d977" stroke-width="0.9" opacity="0.6"/>
+          <circle cx="100" cy="110" r="42" fill="rgba(122, 191, 140, 0.08)" stroke="#7abf8c" stroke-width="1.5"/>
+          <circle cx="106" cy="104" r="15" fill="rgba(200, 169, 110, 0.2)" stroke="#c8a96e" stroke-width="1.1"/>
+          <path d="M 75 110 Q 85 95, 95 115 T 115 105 T 130 118" fill="none" stroke="#7abf8c" stroke-width="1" opacity="0.75"/>
+          <path d="M 52 100 C 48 85, 55 70, 70 65 C 85 60, 95 62, 110 56" fill="none" stroke="#7abf8c" stroke-width="1.3"/>
+          <path d="M 50 112 C 42 95, 50 78, 66 73 C 82 68, 92 70, 107 64" fill="none" stroke="#7abf8c" stroke-width="1.3" stroke-dasharray="4 2"/>
+          <circle cx="70" cy="62" r="2" fill="#c8a96e"/>
+          <circle cx="85" cy="58" r="2" fill="#c8a96e"/>
+          <circle cx="58" cy="74" r="2" fill="#c8a96e"/>
+          <circle cx="48" cy="94" r="2" fill="#c8a96e"/>
+          <circle cx="145" cy="70" r="6.5" fill="none" stroke="#7abf8c" stroke-width="1.1"/>
+          <circle cx="160" cy="85" r="5" fill="none" stroke="#a3d977" stroke-width="1.1"/>
+          <circle cx="150" cy="155" r="5.5" fill="none" stroke="#c8a96e" stroke-width="1.1"/>
+        </g>
+
+        <!-- Mitochondria organelle structure -->
+        <g class="bio-mitochondria" transform="translate(180, 560)" opacity="0.85">
+          <rect x="0" y="0" width="130" height="66" rx="33" fill="rgba(122, 191, 140, 0.08)" stroke="#7abf8c" stroke-width="1.6"/>
+          <rect x="5" y="5" width="120" height="56" rx="28" fill="none" stroke="#a3d977" stroke-width="1" stroke-dasharray="6 2"/>
+          <path d="M 28 5 L 28 32 C 28 38, 36 38, 36 32 L 36 5
+                   M 48 61 L 48 28 C 48 22, 56 22, 56 28 L 56 61
+                   M 68 5 L 68 36 C 68 42, 76 42, 76 36 L 76 5
+                   M 88 61 L 88 26 C 88 20, 96 20, 96 26 L 96 61
+                   M 106 12 L 106 34"
+                fill="none" stroke="#c8a96e" stroke-width="1.4" stroke-linecap="round"/>
+        </g>
+
+        <!-- Circular DNA Ring Vector -->
+        <g class="bio-circular-vector" transform="translate(680, 530)" opacity="0.88">
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#7abf8c" stroke-width="1.8"/>
+          <circle cx="70" cy="70" r="44" fill="none" stroke="#a3d977" stroke-width="1.3" stroke-dasharray="14 3"/>
+          <path d="M 122 70 A 52 52 0 0 1 106 112" fill="none" stroke="#c8a96e" stroke-width="4.8" stroke-linecap="round"/>
+          <path d="M 33 33 A 52 52 0 0 1 70 18" fill="none" stroke="#a3d977" stroke-width="4.2" stroke-linecap="round"/>
+          <line x1="70" y1="14" x2="70" y2="22" stroke="#c8a96e" stroke-width="1.8"/>
+          <line x1="122" y1="70" x2="128" y2="70" stroke="#7abf8c" stroke-width="1.8"/>
+          <line x1="18" y1="70" x2="24" y2="70" stroke="#7abf8c" stroke-width="1.8"/>
+        </g>
+
+        <!-- Chloroplast organelle -->
+        <g class="bio-chloroplast" transform="translate(420, 30)" opacity="0.8">
+          <ellipse cx="80" cy="42" rx="72" ry="34" fill="rgba(122, 191, 140, 0.06)" stroke="#7abf8c" stroke-width="1.5"/>
+          <ellipse cx="80" cy="42" rx="66" ry="28" fill="none" stroke="#a3d977" stroke-width="0.9" stroke-dasharray="4 2"/>
+          <line x1="38" y1="36" x2="56" y2="36" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="38" y1="42" x2="56" y2="42" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="38" y1="48" x2="56" y2="48" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="56" y1="42" x2="72" y2="42" stroke="#a3d977" stroke-width="1.1"/>
+          <line x1="72" y1="32" x2="90" y2="32" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="72" y1="38" x2="90" y2="38" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="72" y1="44" x2="90" y2="44" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="72" y1="50" x2="90" y2="50" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="90" y1="42" x2="106" y2="42" stroke="#a3d977" stroke-width="1.1"/>
+          <line x1="106" y1="36" x2="124" y2="36" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="106" y1="42" x2="124" y2="42" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="106" y1="48" x2="124" y2="48" stroke="#7abf8c" stroke-width="2.6" stroke-linecap="round"/>
+        </g>
+
+        <!-- Catecholamine molecular ring structure -->
+        <g class="bio-molecule" transform="translate(190, 160)" opacity="0.8">
+          <polygon points="50,20 76,35 76,65 50,80 24,65 24,35" fill="none" stroke="#c8a96e" stroke-width="1.4"/>
+          <line x1="30" y1="39" x2="30" y2="61" stroke="#c8a96e" stroke-width="1.1"/>
+          <line x1="50" y1="73" x2="71" y2="61" stroke="#c8a96e" stroke-width="1.1"/>
+          <line x1="50" y1="27" x2="71" y2="39" stroke="#c8a96e" stroke-width="1.1"/>
+          <line x1="24" y1="35" x2="10" y2="27" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="7" cy="25" r="2.8" fill="#7abf8c"/>
+          <line x1="24" y1="65" x2="10" y2="73" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="7" cy="75" r="2.8" fill="#7abf8c"/>
+          <line x1="76" y1="50" x2="96" y2="50" stroke="#c8a96e" stroke-width="1.4"/>
+          <line x1="96" y1="50" x2="110" y2="38" stroke="#c8a96e" stroke-width="1.4"/>
+          <circle cx="110" cy="38" r="2.2" fill="#c8a96e"/>
+          <line x1="110" y1="38" x2="128" y2="48" stroke="#c8a96e" stroke-width="1.4"/>
+          <line x1="128" y1="48" x2="144" y2="40" stroke="#c8a96e" stroke-width="1.4"/>
+          <circle cx="144" cy="40" r="2.8" fill="#c8a96e"/>
+        </g>
+
+        <!-- Neural membrane & axon segments -->
+        <g class="bio-axon-nerve" transform="translate(360, 680)" opacity="0.8">
+          <line x1="0" y1="20" x2="260" y2="20" stroke="#7abf8c" stroke-width="1.6" stroke-dasharray="3 3"/>
+          <rect x="15" y="10" width="55" height="20" rx="7" fill="rgba(122, 191, 140, 0.1)" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="42" cy="20" r="2.8" fill="#7abf8c"/>
+          <rect x="80" y="10" width="55" height="20" rx="7" fill="rgba(122, 191, 140, 0.1)" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="107" cy="20" r="2.8" fill="#7abf8c"/>
+          <rect x="145" y="10" width="55" height="20" rx="7" fill="rgba(122, 191, 140, 0.1)" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="172" cy="20" r="2.8" fill="#7abf8c"/>
+          <rect x="210" y="10" width="45" height="20" rx="7" fill="rgba(122, 191, 140, 0.1)" stroke="#7abf8c" stroke-width="1.4"/>
+          <circle cx="232" cy="20" r="2.8" fill="#7abf8c"/>
+          <line x1="75" y1="6" x2="75" y2="34" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="2 2"/>
+          <line x1="140" y1="6" x2="140" y2="34" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="2 2"/>
+          <line x1="205" y1="6" x2="205" y2="34" stroke="#c8a96e" stroke-width="1.2" stroke-dasharray="2 2"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="grid-wrap" id="gridWrap"></div>
+  </div>
+
+  <!-- Virtual Mobile Keyboard -->
+  <div class="keyboard-panel" id="virtualKeyboard">
+    <div class="kb-row">
+      <button class="kb-key" data-char="Q">Q</button>
+      <button class="kb-key" data-char="W">W</button>
+      <button class="kb-key" data-char="E">E</button>
+      <button class="kb-key" data-char="R">R</button>
+      <button class="kb-key" data-char="T">T</button>
+      <button class="kb-key" data-char="Y">Y</button>
+      <button class="kb-key" data-char="U">U</button>
+      <button class="kb-key" data-char="I">I</button>
+      <button class="kb-key" data-char="O">O</button>
+      <button class="kb-key" data-char="P">P</button>
+    </div>
+    <div class="kb-row">
+      <button class="kb-key" data-char="A">A</button>
+      <button class="kb-key" data-char="S">S</button>
+      <button class="kb-key" data-char="D">D</button>
+      <button class="kb-key" data-char="F">F</button>
+      <button class="kb-key" data-char="G">G</button>
+      <button class="kb-key" data-char="H">H</button>
+      <button class="kb-key" data-char="J">J</button>
+      <button class="kb-key" data-char="K">K</button>
+      <button class="kb-key" data-char="L">L</button>
+    </div>
+    <div class="kb-row">
+      <button class="kb-key action-key" id="kbToggleDir" title="Switch direction">🧬 DIR ⇄</button>
+      <button class="kb-key" data-char="Z">Z</button>
+      <button class="kb-key" data-char="X">X</button>
+      <button class="kb-key" data-char="C">C</button>
+      <button class="kb-key" data-char="V">V</button>
+      <button class="kb-key" data-char="B">B</button>
+      <button class="kb-key" data-char="N">N</button>
+      <button class="kb-key" data-char="M">M</button>
+      <button class="kb-key backspace-key" id="kbBackspace" title="Delete">⌫</button>
+    </div>
+  </div>
+
+  <!-- Bottom Action Bar (Directly Below Keyboard for Mobile Thumb Reach) -->
+  <nav class="bottom-action-bar" aria-label="Game actions">
+    <button class="bottom-btn" id="cluesListBtn" title="View all clues">
+      <span class="btn-glyph" aria-hidden="true">🔬</span>
+      <span class="btn-label">Clues</span>
+    </button>
+    <button class="bottom-btn danger" id="clearBtn" title="Reset puzzle">
+      <span class="btn-glyph" aria-hidden="true">↺</span>
+      <span class="btn-label">Reset</span>
+    </button>
+    <button class="bottom-btn primary" id="submitBtn" title="Submit official answers">
+      <span class="btn-glyph" aria-hidden="true">✓</span>
+      <span class="btn-label">Submit</span>
+    </button>
+  </nav>
+
+  <!-- Toast Notification -->
+  <div class="toast-banner" id="toastBanner"></div>
+
+  <!-- Full Clues List Bottom Sheet -->
+  <div class="sheet-backdrop" id="cluesSheetBackdrop">
+    <div class="sheet-modal">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">🔬 Cellular Genome &amp; Pathways</span>
+        <button class="sheet-close-btn" id="closeCluesSheetBtn">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="sheet-section">
+          <h3>ACROSS</h3>
+          <div id="modalAcrossList"></div>
+        </div>
+        <div class="sheet-section">
+          <h3>DOWN</h3>
+          <div id="modalDownList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Submission Modal -->
+  <div class="sheet-backdrop" id="submissionModalBackdrop">
+    <div class="sheet-modal" style="max-height: 85vh;">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="sheet-title" id="submissionModalTitle">🔬 Cellular Assay Verification</span>
+        <button class="sheet-close-btn" id="closeSubmissionModalBtn">✕</button>
+      </div>
+      <div class="sheet-body" id="submissionModalBody">
+        <div id="submissionPromptView">
+          <p style="font-family:'Georgia',serif; font-size:0.88rem; line-height:1.55; color:var(--text); margin-bottom:12px;">
+            Ready to submit your cellular puzzle for server assay validation?
+          </p>
+          <div class="stats-card" id="submissionStatsSummary">
+            <!-- Dynamically populated -->
+          </div>
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button class="modal-btn secondary" id="cancelSubmitBtn">Review Slide</button>
+            <button class="modal-btn primary" id="confirmSubmitBtn">Run Assay</button>
+          </div>
+        </div>
+
+        <div id="submissionLoadingView" style="display:none; text-align:center; padding:30px 10px;">
+          <div class="spinner"></div>
+          <p style="margin-top:16px; font-family:'Georgia',serif; font-weight:700; font-size:0.95rem;">Executing Cellular Assay…</p>
+          <p style="font-size:0.78rem; color:var(--muted); margin-top:6px;">Comparing submitted puzzle sequence against private server key.</p>
+        </div>
+
+        <div id="submissionResultView" style="display:none; text-align:center; padding:10px 0;">
+          <div class="result-badge" id="resultBadgeIcon">🏆</div>
+          <h2 id="resultHeading" style="font-family:'Georgia',serif; font-size:1.25rem; margin:10px 0 6px;">Assay Verification Result</h2>
+          <p id="resultSubtext" style="font-size:0.87rem; color:var(--muted); margin-bottom:16px;"></p>
+          <div class="stats-card" id="resultScoreBreakdown"></div>
+          <button class="modal-btn primary" id="dismissResultBtn" style="margin-top:16px;">Return to Slide</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Team entry gate: a fresh, empty crossword and official timer for each attempt. -->
+<div class="sheet-backdrop open participant-gate-backdrop" id="participantGateBackdrop" role="dialog" aria-modal="true" aria-labelledby="participantGateTitle">
+  <div class="sheet-modal participant-gate-modal">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title" id="participantGateTitle">MoleClues · Team Entry</span>
+    </div>
+    <div class="sheet-body participant-gate-body">
+      <p class="participant-gate-copy">Enter your team name to begin. Your official time starts when you press <strong>Start Crossword</strong>.</p>
+      <form id="participantForm" autocomplete="off">
+        <label for="teamNameInput">Team name</label>
+        <input id="teamNameInput" name="teamName" class="participant-input" type="text" maxlength="80" autocomplete="off" required placeholder="Enter your team name">
+        <p class="participant-privacy-note">Your team name, score and completion time are visible to event administrators for ranking.</p>
+        <p id="participantGateError" class="participant-gate-error" role="alert" aria-live="polite"></p>
+        <button class="modal-btn primary participant-start-button" id="startPuzzleBtn" type="submit">Start Crossword</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Terminal clue: deliberately contains only the organizer-provided riddle, with no answer field or controls. -->
+<main id="completionRiddleScreen" class="completion-riddle-screen" hidden aria-live="assertive" aria-label="Final clue">
+  <p class="completion-riddle-copy">I can give light without any energy,
+Always clean never in debris
+Look at me I may look round,
+Gain some potential and reach my ground
+Leave your belonging in the first step,
+Come above and unlock the treasure chest.</p>
+</main>
+
+<script src="puzzle-config.js"></script>
+<script src="app.js"></script>
+
+<!-- Living Microscopy Canvas Animation: Floating Amoeboid Cells, Rotating DNA, Molecular Hexagons & Bonds -->
+<script>
+(function () {
+  'use strict';
+  var canvas = document.getElementById('bio-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var W, H;
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  // 1. Mitochondria (Double-membrane organelle with folded inner cristae & ATP granules)
+  function BioMitochondrion() {
+    this.reset(true);
+  }
+  BioMitochondrion.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 60;
+    this.w = 34 + Math.random() * 20;
+    this.h = this.w * (0.48 + Math.random() * 0.1);
+    this.vx = (Math.random() - 0.5) * 0.22;
+    this.vy = -0.16 - Math.random() * 0.22;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.003;
+    this.cristaeFolds = 5 + Math.floor(Math.random() * 3);
+  };
+  BioMitochondrion.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rot += this.rotSpeed;
+    if (this.y < -80) this.reset(false);
+    if (this.x < -80) this.x = W + 70;
+    if (this.x > W + 80) this.x = -70;
+  };
+  BioMitochondrion.prototype.draw = function () {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    var hw = this.w / 2;
+    var hh = this.h / 2;
+
+    // Outer membrane capsule
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(-hw, -hh, this.w, this.h, hh);
+    } else {
+      ctx.ellipse(0, 0, hw, hh, 0, 0, Math.PI * 2);
+    }
+    ctx.fillStyle = 'rgba(122, 191, 140, 0.08)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.5)';
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+
+    // Inner membrane boundary
+    var ihw = hw - 3.5;
+    var ihh = hh - 3.5;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(-ihw, -ihh, ihw * 2, ihh * 2, ihh);
+    } else {
+      ctx.ellipse(0, 0, ihw, ihh, 0, 0, Math.PI * 2);
+    }
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.4)';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    // Cristae folds (transverse interdigitating inner membrane ridges)
+    var step = (ihw * 1.5) / (this.cristaeFolds + 1);
+    ctx.beginPath();
+    for (var i = 0; i < this.cristaeFolds; i++) {
+      var cx = -ihw * 0.75 + (i + 1) * step;
+      var dir = (i % 2 === 0) ? 1 : -1;
+      var yStart = dir * (ihh * 0.78);
+      var yEnd = -dir * (ihh * 0.35);
+      ctx.moveTo(cx, yStart);
+      ctx.lineTo(cx, yEnd);
+    }
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.55)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // ATP synthase granules (amber dots inside matrix)
+    ctx.fillStyle = 'rgba(212, 178, 110, 0.65)';
+    ctx.beginPath();
+    ctx.arc(-ihw * 0.35, ihh * 0.2, 1.4, 0, Math.PI * 2);
+    ctx.arc(ihw * 0.3, -ihh * 0.15, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  // 2. Nucleus (Eukaryotic nucleus with pores, chromatin mesh, and dense nucleolus)
+  function BioNucleus() {
+    this.reset(true);
+  }
+  BioNucleus.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 90;
+    this.r = 26 + Math.random() * 16;
+    this.vx = (Math.random() - 0.5) * 0.16;
+    this.vy = -0.12 - Math.random() * 0.16;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.002;
+    this.nucleolusOffX = (Math.random() - 0.5) * (this.r * 0.3);
+    this.nucleolusOffY = (Math.random() - 0.5) * (this.r * 0.3);
+  };
+  BioNucleus.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rot += this.rotSpeed;
+    if (this.y < -100) this.reset(false);
+    if (this.x < -100) this.x = W + 90;
+    if (this.x > W + 100) this.x = -90;
+  };
+  BioNucleus.prototype.draw = function () {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    // Outer nuclear envelope
+    ctx.beginPath();
+    ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(122, 191, 140, 0.07)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.45)';
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+
+    // Inner nuclear envelope
+    ctx.beginPath();
+    ctx.arc(0, 0, this.r - 3, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.35)';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    // Nuclear pores (dots along envelope perimeter)
+    var poreCount = 10;
+    ctx.fillStyle = 'rgba(163, 217, 119, 0.6)';
+    for (var p = 0; p < poreCount; p++) {
+      var pAng = (p / poreCount) * Math.PI * 2;
+      var px = Math.cos(pAng) * (this.r - 1.5);
+      var py = Math.sin(pAng) * (this.r - 1.5);
+      ctx.beginPath();
+      ctx.arc(px, py, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Chromatin strands inside nucleoplasm
+    ctx.beginPath();
+    ctx.arc(0, 0, this.r * 0.6, 0.4, 3.2);
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(this.nucleolusOffX * 0.5, this.nucleolusOffY * 0.5, this.r * 0.42, 2.1, 5.8);
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Dense Nucleolus
+    ctx.beginPath();
+    ctx.arc(this.nucleolusOffX, this.nucleolusOffY, this.r * 0.32, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(212, 178, 110, 0.35)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(212, 178, 110, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  // 3. DNA Double Helix (Intertwined dual strands with base-pair hydrogen rungs)
+  function BioDNA() {
+    this.reset(true);
+  }
+  BioDNA.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 80;
+    this.len = 65 + Math.random() * 45;
+    this.vx = (Math.random() - 0.5) * 0.18;
+    this.vy = -0.18 - Math.random() * 0.22;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.004;
+    this.rungs = 8;
+  };
+  BioDNA.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rot += this.rotSpeed;
+    if (this.y < -110) this.reset(false);
+    if (this.x < -60) this.x = W + 50;
+    if (this.x > W + 60) this.x = -50;
+  };
+  BioDNA.prototype.draw = function (time) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    var h = this.len;
+    var amp = 13;
+    var wave = time * 0.0018;
+
+    // Hydrogen bond rungs
+    for (var i = 0; i < this.rungs; i++) {
+      var frac = i / (this.rungs - 1);
+      var ry = -h / 2 + frac * h;
+      var phase = frac * Math.PI * 2.8 + wave;
+      var x1 = Math.sin(phase) * amp;
+      var x2 = -x1;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, ry);
+      ctx.lineTo(x2, ry);
+      ctx.strokeStyle = 'rgba(212, 178, 110, 0.38)';
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+
+      // Hydrogen bond node
+      ctx.beginPath();
+      ctx.arc(0, ry, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(212, 178, 110, 0.6)';
+      ctx.fill();
+    }
+
+    // Strand A (Emerald Chlorophyll)
+    ctx.beginPath();
+    for (var j = 0; j <= 24; j++) {
+      var fj = j / 24;
+      var yj = -h / 2 + fj * h;
+      var pj = fj * Math.PI * 2.8 + wave;
+      var xj = Math.sin(pj) * amp;
+      if (j === 0) ctx.moveTo(xj, yj);
+      else ctx.lineTo(xj, yj);
+    }
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.55)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    // Strand B (Bio Lime)
+    ctx.beginPath();
+    for (var k = 0; k <= 24; k++) {
+      var fk = k / 24;
+      var yk = -h / 2 + fk * h;
+      var pk = fk * Math.PI * 2.8 + wave;
+      var xk = -Math.sin(pk) * amp;
+      if (k === 0) ctx.moveTo(xk, yk);
+      else ctx.lineTo(xk, yk);
+    }
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.55)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  // 4. RNA (Single-stranded messenger RNA with exposed nucleotide bases)
+  function BioRNA() {
+    this.reset(true);
+  }
+  BioRNA.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 70;
+    this.len = 55 + Math.random() * 40;
+    this.vx = (Math.random() - 0.5) * 0.2;
+    this.vy = -0.15 - Math.random() * 0.2;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.005;
+    this.bases = 7;
+  };
+  BioRNA.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rot += this.rotSpeed;
+    if (this.y < -90) this.reset(false);
+    if (this.x < -50) this.x = W + 40;
+    if (this.x > W + 50) this.x = -40;
+  };
+  BioRNA.prototype.draw = function (time) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    var h = this.len;
+    var amp = 10;
+    var wave = time * 0.0022;
+
+    // Single strand backbone
+    ctx.beginPath();
+    for (var s = 0; s <= 20; s++) {
+      var fs = s / 20;
+      var ys = -h / 2 + fs * h;
+      var ps = fs * Math.PI * 2.2 + wave;
+      var xs = Math.sin(ps) * amp;
+      if (s === 0) ctx.moveTo(xs, ys);
+      else ctx.lineTo(xs, ys);
+    }
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.65)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Exposed ribonucleotide bases (perpendicular protrusions)
+    for (var b = 0; b < this.bases; b++) {
+      var fb = b / (this.bases - 1);
+      var yb = -h / 2 + fb * h;
+      var pb = fb * Math.PI * 2.2 + wave;
+      var xb = Math.sin(pb) * amp;
+      var normalX = Math.cos(pb) * 8;
+
+      ctx.beginPath();
+      ctx.moveTo(xb, yb);
+      ctx.lineTo(xb + normalX, yb);
+      ctx.strokeStyle = (b % 2 === 0) ? 'rgba(212, 178, 110, 0.6)' : 'rgba(122, 191, 140, 0.6)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(xb + normalX, yb, 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = (b % 2 === 0) ? 'rgba(212, 178, 110, 0.75)' : 'rgba(122, 191, 140, 0.75)';
+      ctx.fill();
+    }
+
+    ctx.restore();
+  };
+
+  // 5. Protein (Folded globular enzyme with active catalytic site cleft & peptide domains)
+  function BioProtein() {
+    this.reset(true);
+  }
+  BioProtein.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 60;
+    this.r = 14 + Math.random() * 10;
+    this.vx = (Math.random() - 0.5) * 0.2;
+    this.vy = -0.14 - Math.random() * 0.18;
+    this.rot = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.004;
+  };
+  BioProtein.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.rot += this.rotSpeed;
+    if (this.y < -70) this.reset(false);
+    if (this.x < -60) this.x = W + 50;
+    if (this.x > W + 60) this.x = -50;
+  };
+  BioProtein.prototype.draw = function (time) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+
+    var r = this.r;
+    var pulse = Math.sin(time * 0.002 + this.x) * 1.5;
+
+    // Subunit Domain A
+    ctx.beginPath();
+    ctx.arc(-r * 0.45, -r * 0.2, r * 0.55 + pulse * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(122, 191, 140, 0.2)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.5)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    // Subunit Domain B
+    ctx.beginPath();
+    ctx.arc(r * 0.4, -r * 0.25, r * 0.5 + pulse * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(163, 217, 119, 0.2)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(163, 217, 119, 0.5)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    // Subunit Domain C
+    ctx.beginPath();
+    ctx.arc(0, r * 0.4, r * 0.52 - pulse * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(122, 191, 140, 0.17)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(122, 191, 140, 0.45)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    // Active Catalytic Site Cleft (Warm Amber Enzyme Pocket)
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(212, 178, 110, 0.42)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(212, 178, 110, 0.7)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  // 6. BioVesicles (Micro transport droplets & signal vesicles)
+  function BioVesicle() {
+    this.reset(true);
+  }
+  BioVesicle.prototype.reset = function (randomY) {
+    this.x = Math.random() * W;
+    this.y = randomY ? Math.random() * H : H + 20;
+    this.r = 2.0 + Math.random() * 2.8;
+    this.vx = (Math.random() - 0.5) * 0.16;
+    this.vy = -0.12 - Math.random() * 0.18;
+    this.color = Math.random() > 0.4 ? 'rgba(122, 191, 140,' : (Math.random() > 0.5 ? 'rgba(163, 217, 119,' : 'rgba(212, 178, 110,');
+    this.alpha = 0.28 + Math.random() * 0.35;
+  };
+  BioVesicle.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.y < -20) this.reset(false);
+    if (this.x < -20) this.x = W + 10;
+    if (this.x > W + 20) this.x = -10;
+  };
+  BioVesicle.prototype.draw = function () {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color + this.alpha + ')';
+    ctx.fill();
+    ctx.strokeStyle = this.color + (this.alpha + 0.2) + ')';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  };
+
+  var mitos = [], nuclei = [], dnas = [], rnas = [], proteins = [], vesicles = [];
+
+  function init() {
+    resize();
+    var isMobile = W < 600;
+    var mitoCount = isMobile ? 4 : 6;
+    var nucleusCount = isMobile ? 3 : 4;
+    var dnaCount = isMobile ? 4 : 6;
+    var rnaCount = isMobile ? 4 : 6;
+    var proteinCount = isMobile ? 4 : 7;
+    var vesicleCount = isMobile ? 18 : 32;
+
+    mitos = []; for (var i = 0; i < mitoCount; i++) mitos.push(new BioMitochondrion());
+    nuclei = []; for (var j = 0; j < nucleusCount; j++) nuclei.push(new BioNucleus());
+    dnas = []; for (var k = 0; k < dnaCount; k++) dnas.push(new BioDNA());
+    rnas = []; for (var m = 0; m < rnaCount; m++) rnas.push(new BioRNA());
+    proteins = []; for (var n = 0; n < proteinCount; n++) proteins.push(new BioProtein());
+    vesicles = []; for (var p = 0; p < vesicleCount; p++) vesicles.push(new BioVesicle());
+  }
+
+  function loop(time) {
+    ctx.clearRect(0, 0, W, H);
+
+    // 1. BioVesicles
+    for (var v = 0; v < vesicles.length; v++) {
+      vesicles[v].update();
+      vesicles[v].draw();
+    }
+
+    // 2. Mitochondria
+    for (var m = 0; m < mitos.length; m++) {
+      mitos[m].update();
+      mitos[m].draw();
+    }
+
+    // 3. Nuclei
+    for (var n = 0; n < nuclei.length; n++) {
+      nuclei[n].update();
+      nuclei[n].draw();
+    }
+
+    // 4. DNA Helixes
+    for (var d = 0; d < dnas.length; d++) {
+      dnas[d].update();
+      dnas[d].draw(time);
+    }
+
+    // 5. RNA Strands
+    for (var r = 0; r < rnas.length; r++) {
+      rnas[r].update();
+      rnas[r].draw(time);
+    }
+
+    // 6. Folded Proteins
+    for (var p = 0; p < proteins.length; p++) {
+      proteins[p].update();
+      proteins[p].draw(time);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', function () {
+    resize();
+  });
+
+  init();
+  requestAnimationFrame(loop);
+}());
+</script>
+
+</body>
+</html>
